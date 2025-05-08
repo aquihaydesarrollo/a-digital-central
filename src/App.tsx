@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider } from "./contexts/AppContext";
 import { useEffect } from "react";
 import { initializeApp } from "./utils/localStorage";
+import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut } from '@clerk/clerk-react';
 
 // Páginas públicas
 import Index from "./pages/Index";
@@ -14,6 +15,7 @@ import QuienesSomos from "./pages/QuienesSomos";
 import Servicios from "./pages/Servicios";
 import Carrito from "./pages/Carrito";
 import Login from "./pages/Login";
+import Registro from "./pages/Registro";
 import NotFound from "./pages/NotFound";
 
 // Páginas de administración
@@ -44,62 +46,70 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              {/* Rutas públicas */}
-              <Route path="/" element={<Index />} />
-              <Route path="/quienes-somos" element={<QuienesSomos />} />
-              <Route path="/servicios" element={<Servicios />} />
-              <Route path="/carrito" element={<Carrito />} />
-              <Route path="/login" element={<Login />} />
+            <ClerkLoading>
+              <div className="h-screen w-full flex items-center justify-center">
+                Cargando...
+              </div>
+            </ClerkLoading>
+            <ClerkLoaded>
+              <Routes>
+                {/* Rutas públicas */}
+                <Route path="/" element={<Index />} />
+                <Route path="/quienes-somos" element={<QuienesSomos />} />
+                <Route path="/servicios" element={<Servicios />} />
+                <Route path="/carrito" element={<Carrito />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/registro" element={<Registro />} />
 
-              {/* Rutas de administración protegidas */}
-              <Route path="/admin" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/clientes" element={
-                <ProtectedRoute>
-                  <Clientes />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/empleados" element={
-                <ProtectedRoute>
-                  <Empleados />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/facturas" element={
-                <ProtectedRoute>
-                  <Facturas />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/documentos" element={
-                <ProtectedRoute>
-                  <Documentos />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/tareas" element={
-                <ProtectedRoute>
-                  <Tareas />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/calendario" element={
-                <ProtectedRoute>
-                  <Calendario />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/configuracion" element={
-                <ProtectedRoute>
-                  <Configuracion />
-                </ProtectedRoute>
-              } />
+                {/* Rutas de administración protegidas */}
+                <Route path="/admin" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/clientes" element={
+                  <ProtectedRoute>
+                    <Clientes />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/empleados" element={
+                  <ProtectedRoute>
+                    <Empleados />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/facturas" element={
+                  <ProtectedRoute>
+                    <Facturas />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/documentos" element={
+                  <ProtectedRoute>
+                    <Documentos />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/tareas" element={
+                  <ProtectedRoute>
+                    <Tareas />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/calendario" element={
+                  <ProtectedRoute>
+                    <Calendario />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/configuracion" element={
+                  <ProtectedRoute>
+                    <Configuracion />
+                  </ProtectedRoute>
+                } />
 
-              {/* Redireccion de /admin/* a /admin si no hay ruta específica */}
-              <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
+                {/* Redireccion de /admin/* a /admin si no hay ruta específica */}
+                <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
 
-              {/* Ruta 404 - Not found */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                {/* Ruta 404 - Not found */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ClerkLoaded>
           </BrowserRouter>
         </TooltipProvider>
       </AppProvider>
