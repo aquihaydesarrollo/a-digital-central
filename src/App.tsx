@@ -19,6 +19,12 @@ import NotFound from "./pages/NotFound";
 // Páginas de administración
 import Dashboard from "./pages/admin/Dashboard";
 import Clientes from "./pages/admin/Clientes";
+import Empleados from "./pages/admin/Empleados";
+import Facturas from "./pages/admin/Facturas";
+import Documentos from "./pages/admin/Documentos";
+import Tareas from "./pages/admin/Tareas";
+import Calendario from "./pages/admin/Calendario";
+import Configuracion from "./pages/admin/Configuracion";
 
 // Protección de rutas
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -55,6 +61,36 @@ const App = () => {
               <Route path="/admin/clientes" element={
                 <ProtectedRoute>
                   <Clientes />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/empleados" element={
+                <ProtectedRoute>
+                  <Empleados />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/facturas" element={
+                <ProtectedRoute>
+                  <Facturas />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/documentos" element={
+                <ProtectedRoute>
+                  <Documentos />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/tareas" element={
+                <ProtectedRoute>
+                  <Tareas />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/calendario" element={
+                <ProtectedRoute>
+                  <Calendario />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/configuracion" element={
+                <ProtectedRoute>
+                  <Configuracion />
                 </ProtectedRoute>
               } />
 
