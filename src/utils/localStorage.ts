@@ -135,6 +135,51 @@ export const initializeApp = () => {
     localStorage.setItem('documentos', JSON.stringify([]));
     localStorage.setItem('tareas', JSON.stringify([]));
     
+    // Crear clientes de prueba
+    const clientesPrueba = [
+      {
+        id: uuidv4(),
+        asesoriaId: defaultAsesoria.id,
+        nombre: 'Restaurante El Buen Sabor S.L.',
+        nif: 'B87654321',
+        direccion: 'Calle Serrano 45, 28001 Madrid',
+        telefono: '911222333',
+        email: 'info@elbuensabor.es',
+        personaContacto: 'María López',
+        periodicidadFiscal: 'Trimestral',
+        modelosFiscales: '303, 390, 111',
+        tipoImpuesto: 'General'
+      },
+      {
+        id: uuidv4(),
+        asesoriaId: defaultAsesoria.id,
+        nombre: 'Talleres Mecánicos Rodríguez',
+        nif: '12345678Z',
+        direccion: 'Polígono Industrial Norte 23, 28760 Tres Cantos',
+        telefono: '911333444',
+        email: 'talleres@rodriguez.com',
+        personaContacto: 'Antonio Rodríguez',
+        periodicidadFiscal: 'Trimestral',
+        modelosFiscales: '303, 100, 115',
+        tipoImpuesto: 'Reducido'
+      },
+      {
+        id: uuidv4(),
+        asesoriaId: defaultAsesoria.id,
+        nombre: 'Consultora Tecnológica Innova',
+        nif: 'A12345678',
+        direccion: 'Paseo de la Castellana 200, 28046 Madrid',
+        telefono: '917654321',
+        email: 'contacto@innova.tech',
+        personaContacto: 'Carlos Gómez',
+        periodicidadFiscal: 'Mensual',
+        modelosFiscales: '303, 200, 115, 180',
+        tipoImpuesto: 'General'
+      }
+    ];
+    
+    localStorage.setItem('clientes', JSON.stringify(clientesPrueba));
+    
     // Crear servicios iniciales
     const serviciosIniciales: Servicio[] = [
       {

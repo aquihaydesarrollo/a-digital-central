@@ -1,349 +1,306 @@
 
 import React, { useState } from 'react';
-import { useApp } from '../../contexts/AppContext';
 import AdminLayout from '../../components/Layout/AdminLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getAsesoria, updateAsesoria, initializeApp } from '../../utils/localStorage';
-import { 
-  Building, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  User, 
-  Key, 
-  Save, 
-  RefreshCw, 
-  Trash,
-  AlertCircle
-} from 'lucide-react';
+import { getAsesoria, updateAsesoria } from '../../utils/localStorage';
+import { useApp } from '../../contexts/AppContext';
 
 const Configuracion = () => {
-  const { refreshData, asesoria } = useApp();
-  const [datosAsesoria, setDatosAsesoria] = useState(asesoria || getAsesoria());
-  const [enviarCopiaEmail, setEnviarCopiaEmail] = useState(true);
-  const [notificacionesPush, setNotificacionesPush] = useState(true);
-  const [recordatorios, setRecordatorios] = useState(true);
+  const { asesoria, refreshData } = useApp();
+  const [formData, setFormData] = useState(asesoria || {
+    nombre: '',
+    cif: '',
+    direccion: '',
+    telefono: '',
+    email: ''
+  });
 
-  const handleAsesoriaChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setDatosAsesoria(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleGuardarAsesoria = () => {
-    updateAsesoria(datosAsesoria);
-    refreshData();
-    toast.success('Datos de la asesoría actualizados correctamente');
-  };
-
-  const handleResetDatos = () => {
-    if (window.confirm('¿Está seguro de que desea reiniciar todos los datos de la aplicación? Esta acción no se puede deshacer.')) {
-      localStorage.clear();
-      initializeApp();
+  const handleGuardarAjustes = () => {
+    try {
+      updateAsesoria({
+        ...formData,
+        id: asesoria?.id || ''
+      });
       refreshData();
-      toast.success('Todos los datos han sido reiniciados correctamente');
+      toast.success('Configuración guardada', {
+        description: 'Los datos de la asesoría han sido actualizados correctamente.'
+      });
+    } catch (error) {
+      toast.error('Error al guardar', {
+        description: 'Ha ocurrido un error al guardar la configuración. Inténtelo de nuevo.'
+      });
     }
   };
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Configuración</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-primary">Configuración</h1>
+          <p className="text-gray-500">Gestione los ajustes de su asesoría</p>
         </div>
 
-        <Tabs defaultValue="perfil">
-          <TabsList className="grid grid-cols-3 w-full md:w-[500px]">
-            <TabsTrigger value="perfil">Perfil</TabsTrigger>
-            <TabsTrigger value="asesoría">Asesoría</TabsTrigger>
-            <TabsTrigger value="sistema">Sistema</TabsTrigger>
+        <Tabs defaultValue="general">
+          <TabsList className="mb-4">
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
+            <TabsTrigger value="usuarios">Usuarios</TabsTrigger>
+            <TabsTrigger value="seguridad">Seguridad</TabsTrigger>
           </TabsList>
-          
-          {/* Pestaña de Perfil */}
-          <TabsContent value="perfil" className="space-y-4 mt-6">
+
+          <TabsContent value="general">
             <Card>
               <CardHeader>
-                <CardTitle>Información de Perfil</CardTitle>
+                <CardTitle>Datos de la asesoría</CardTitle>
                 <CardDescription>
-                  Gestiona tu información personal y las preferencias de tu cuenta.
+                  Actualice la información de su asesoría
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Avatar y nombre */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 pb-4 border-b">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src="https://github.com/shadcn.png" alt="Avatar" />
-                    <AvatarFallback>AD</AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-1 text-center sm:text-left">
-                    <h3 className="font-medium text-lg">Administrador</h3>
-                    <p className="text-sm text-muted-foreground">admin@asesoria.es</p>
-                    <div className="flex justify-center sm:justify-start gap-2 mt-2">
-                      <Button variant="outline" size="sm">Cambiar Imagen</Button>
-                      <Button variant="ghost" size="sm">Eliminar</Button>
-                    </div>
-                  </div>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nombre">Nombre de la asesoría</Label>
+                  <Input 
+                    id="nombre" 
+                    name="nombre"
+                    value={formData.nombre} 
+                    onChange={handleInputChange}
+                    placeholder="Nombre de la asesoría" 
+                  />
                 </div>
                 
-                {/* Formulario */}
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="nombre">Nombre</Label>
-                      <div className="relative">
-                        <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="nombre"
-                          placeholder="Tu nombre"
-                          value="Administrador"
-                          className="pl-8"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="tu@email.com"
-                          value="admin@asesoria.es"
-                          className="pl-8"
-                        />
-                      </div>
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cif">CIF</Label>
+                  <Input 
+                    id="cif" 
+                    name="cif"
+                    value={formData.cif} 
+                    onChange={handleInputChange}
+                    placeholder="CIF de la asesoría" 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="direccion">Dirección</Label>
+                  <Input 
+                    id="direccion" 
+                    name="direccion"
+                    value={formData.direccion} 
+                    onChange={handleInputChange}
+                    placeholder="Dirección completa" 
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="telefono">Teléfono</Label>
+                    <Input 
+                      id="telefono" 
+                      name="telefono"
+                      value={formData.telefono} 
+                      onChange={handleInputChange}
+                      placeholder="Teléfono de contacto" 
+                    />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="password">Contraseña</Label>
-                    <div className="relative">
-                      <Key className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="password"
-                        type="password"
-                        value="********"
-                        className="pl-8"
-                      />
+                    <Label htmlFor="email">Email</Label>
+                    <Input 
+                      id="email" 
+                      name="email"
+                      type="email"
+                      value={formData.email} 
+                      onChange={handleInputChange}
+                      placeholder="Email de contacto" 
+                    />
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button onClick={handleGuardarAjustes}>Guardar cambios</Button>
+              </CardFooter>
+            </Card>
+
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle>Logotipos e imagen</CardTitle>
+                <CardDescription>
+                  Personalice la imagen de su asesoría
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Logo principal</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="h-24 w-52 bg-gray-100 rounded flex items-center justify-center border">
+                      <p className="text-gray-400">Logo actual</p>
                     </div>
+                    <Button variant="outline">Cambiar logo</Button>
                   </div>
                 </div>
 
-                {/* Configuración de notificaciones */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="font-medium">Preferencias de Notificación</h3>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <h4 className="font-medium">Notificaciones por email</h4>
-                      <p className="text-muted-foreground text-sm">Recibir notificaciones por correo electrónico</p>
+                <Separator className="my-4" />
+
+                <div className="space-y-2">
+                  <Label>Favicon</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 bg-gray-100 rounded flex items-center justify-center border">
+                      <p className="text-gray-400">Icon</p>
                     </div>
-                    <Switch 
-                      checked={enviarCopiaEmail}
-                      onCheckedChange={setEnviarCopiaEmail}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <h4 className="font-medium">Notificaciones push</h4>
-                      <p className="text-muted-foreground text-sm">Recibir notificaciones en el navegador</p>
-                    </div>
-                    <Switch 
-                      checked={notificacionesPush}
-                      onCheckedChange={setNotificacionesPush}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <h4 className="font-medium">Recordatorios de tareas</h4>
-                      <p className="text-muted-foreground text-sm">Recibir recordatorios de tareas pendientes</p>
-                    </div>
-                    <Switch 
-                      checked={recordatorios}
-                      onCheckedChange={setRecordatorios}
-                    />
+                    <Button variant="outline">Cambiar favicon</Button>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end gap-2">
-                <Button variant="outline">Cancelar</Button>
-                <Button onClick={() => toast.success('Perfil actualizado correctamente')}>
-                  <Save className="mr-2 h-4 w-4" /> Guardar Cambios
-                </Button>
-              </CardFooter>
             </Card>
           </TabsContent>
-          
-          {/* Pestaña de Asesoría */}
-          <TabsContent value="asesoría" className="space-y-4 mt-6">
+
+          <TabsContent value="notificaciones">
             <Card>
               <CardHeader>
-                <CardTitle>Datos de la Asesoría</CardTitle>
+                <CardTitle>Preferencias de notificaciones</CardTitle>
                 <CardDescription>
-                  Configura la información general de tu asesoría.
+                  Configure cómo y cuándo recibir notificaciones
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nombre-asesoria">Nombre de la Asesoría</Label>
-                    <div className="relative">
-                      <Building className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="nombre-asesoria"
-                        name="nombre"
-                        placeholder="Nombre de la asesoría"
-                        value={datosAsesoria.nombre}
-                        onChange={handleAsesoriaChange}
-                        className="pl-8"
-                      />
-                    </div>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Notificaciones por email</p>
+                    <p className="text-sm text-gray-500">Reciba notificaciones importantes en su email</p>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="cif">CIF</Label>
-                    <Input
-                      id="cif"
-                      name="cif"
-                      placeholder="B12345678"
-                      value={datosAsesoria.cif}
-                      onChange={handleAsesoriaChange}
-                    />
+                  <Switch defaultChecked />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Recordatorios de tareas</p>
+                    <p className="text-sm text-gray-500">Reciba recordatorios de tareas pendientes</p>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="direccion">Dirección</Label>
-                    <div className="relative">
-                      <MapPin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Textarea
-                        id="direccion"
-                        name="direccion"
-                        placeholder="Dirección completa"
-                        value={datosAsesoria.direccion}
-                        onChange={handleAsesoriaChange}
-                        className="resize-none pl-8"
-                      />
-                    </div>
+                  <Switch defaultChecked />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Alertas de facturas pendientes</p>
+                    <p className="text-sm text-gray-500">Notificaciones sobre facturas pendientes de pago</p>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="telefono">Teléfono</Label>
-                      <div className="relative">
-                        <Phone className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="telefono"
-                          name="telefono"
-                          placeholder="912345678"
-                          value={datosAsesoria.telefono}
-                          onChange={handleAsesoriaChange}
-                          className="pl-8"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email-asesoria">Email</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="email-asesoria"
-                          name="email"
-                          type="email"
-                          placeholder="contacto@asesoria.es"
-                          value={datosAsesoria.email}
-                          onChange={handleAsesoriaChange}
-                          className="pl-8"
-                        />
-                      </div>
-                    </div>
+                  <Switch defaultChecked />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Notificaciones del sistema</p>
+                    <p className="text-sm text-gray-500">Alertas sobre actualizaciones y mantenimiento</p>
                   </div>
+                  <Switch />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end gap-2">
-                <Button variant="outline">Cancelar</Button>
-                <Button onClick={handleGuardarAsesoria}>
-                  <Save className="mr-2 h-4 w-4" /> Guardar Cambios
-                </Button>
+              <CardFooter>
+                <Button>Guardar preferencias</Button>
               </CardFooter>
             </Card>
           </TabsContent>
-          
-          {/* Pestaña de Sistema */}
-          <TabsContent value="sistema" className="space-y-4 mt-6">
+
+          <TabsContent value="usuarios">
             <Card>
               <CardHeader>
-                <CardTitle>Configuración del Sistema</CardTitle>
+                <CardTitle>Gestión de usuarios</CardTitle>
                 <CardDescription>
-                  Opciones avanzadas y mantenimiento del sistema.
+                  Administre las cuentas de usuarios y sus permisos
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="font-medium">Datos</h3>
-                  
-                  <div className="rounded-lg border p-4 flex flex-col gap-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium">Realizar copia de seguridad</h4>
-                        <p className="text-sm text-muted-foreground">Guarda una copia de todos los datos</p>
-                      </div>
-                      <Button variant="outline" onClick={() => toast.success('Copia de seguridad realizada correctamente')}>
-                        Exportar Datos
-                      </Button>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium">Restaurar datos</h4>
-                        <p className="text-sm text-muted-foreground">Restaura datos desde una copia de seguridad</p>
-                      </div>
-                      <Button variant="outline">Importar Datos</Button>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium text-destructive flex items-center">
-                          <AlertCircle className="h-4 w-4 mr-1" /> Reiniciar datos
-                        </h4>
-                        <p className="text-sm text-muted-foreground">Elimina todos los datos y vuelve a la configuración inicial</p>
-                      </div>
-                      <Button variant="destructive" onClick={handleResetDatos}>
-                        <RefreshCw className="mr-2 h-4 w-4" /> Reiniciar
-                      </Button>
-                    </div>
-                  </div>
+              <CardContent>
+                <div className="relative overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-gray-500 uppercase bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3">Usuario</th>
+                        <th scope="col" className="px-6 py-3">Email</th>
+                        <th scope="col" className="px-6 py-3">Rol</th>
+                        <th scope="col" className="px-6 py-3">Estado</th>
+                        <th scope="col" className="px-6 py-3">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="bg-white border-b">
+                        <td className="px-6 py-4 font-medium">Administrador</td>
+                        <td className="px-6 py-4">admin@asesoria.es</td>
+                        <td className="px-6 py-4">Administrador</td>
+                        <td className="px-6 py-4">
+                          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Activo</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Button variant="ghost" size="sm">Editar</Button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button>Añadir usuario</Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="seguridad">
+            <Card>
+              <CardHeader>
+                <CardTitle>Seguridad</CardTitle>
+                <CardDescription>
+                  Configure opciones de seguridad y acceso
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="current-password">Contraseña actual</Label>
+                  <Input id="current-password" type="password" />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">Nueva contraseña</Label>
+                  <Input id="new-password" type="password" />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirmar nueva contraseña</Label>
+                  <Input id="confirm-password" type="password" />
                 </div>
 
-                <div className="space-y-4">
-                  <h3 className="font-medium">Cuenta</h3>
-                  
-                  <div className="rounded-lg border p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium text-destructive flex items-center">
-                          <AlertCircle className="h-4 w-4 mr-1" /> Eliminar cuenta
-                        </h4>
-                        <p className="text-sm text-muted-foreground">Elimina permanentemente tu cuenta y todos los datos asociados</p>
-                      </div>
-                      <Button variant="destructive">
-                        <Trash className="mr-2 h-4 w-4" /> Eliminar
-                      </Button>
-                    </div>
+                <Separator className="my-4" />
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Autenticación de dos factores</p>
+                    <p className="text-sm text-gray-500">Añade una capa extra de seguridad a tu cuenta</p>
                   </div>
+                  <Switch />
+                </div>
+                
+                <Separator className="my-4" />
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Registro de actividad</p>
+                    <p className="text-sm text-gray-500">Mantener un registro detallado de la actividad de la cuenta</p>
+                  </div>
+                  <Switch defaultChecked />
                 </div>
               </CardContent>
+              <CardFooter>
+                <Button>Actualizar configuración de seguridad</Button>
+              </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
